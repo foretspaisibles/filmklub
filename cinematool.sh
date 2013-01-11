@@ -148,6 +148,7 @@ cinema_db_import()
 
 # cinema_db_delete_item ITEM
 #  Delete the given item from the cinema database
+
 cinema_db_delete_item()
 {
     local itemdir
@@ -194,11 +195,21 @@ $1 == "Wikipedia" {
 END {
   for(lang in language)
   {
-    print(data["Item"], data["File"], data["Title"], language[lang], data["IMDB"], wikipedia[1], wikipedia[2], data["Source"]);
+    print(\
+      data["Item"],\
+      data["File"],\
+      data["Title"],\
+      language[lang],\
+      data["IMDB"],\
+      wikipedia[1],\
+      wikipedia[2],\
+      data["Source"]\
+    );
   }
 }
 '
 }
+
 
 # cinema_db_build_index
 #  Build the index of the cinema database
