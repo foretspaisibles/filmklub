@@ -61,9 +61,7 @@ END {
 	data["Year"],				\
 	data["Director"],			\
 	data["Writer"],				\
-	data["Language"],			\
 	data["Runtime"],			\
-	data["Country"],			\
 	data["Aspect Ratio"]			\
 	) > (resource("+IMDB-INDEX"));
     if(data["Storyline"] != "")

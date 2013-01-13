@@ -39,9 +39,12 @@ EOF
 
 cinema_imdb_index_list="+IMDB-INDEX +IMDB-PLOT +IMDB-STARS +IMDB-GENRE +IMDB-LOCATION +IMDB-STORYLINE"
 
+# cinema_awk …
+#  Wrapper for AWK
+
 cinema_awk()
 {
-    awk -F'|' -v OFS='|' "$@"
+    awk -F'|' -v OFS='|' -v "cinemadbdir=${cinemadbdir}" "$@"
 }
 
 
@@ -399,16 +402,52 @@ cinema_www_install_poster_all()
 
 # cinema_www_mkindex
 #  Generate the index file
+
 cinema_www_mkindex()
 {
-    cinema_www_mkindex_movie_card
+    install -d "${cinemawwwdir}"
+    install -d "${cinemawwwdir}/style"
+    install -m 444 `cinema_maketool movieindex.sgml` "${cinemawwwdir}"
+    install -m 444 `cinema_maketool trendy.css` "${cinemawwwdir}/style"
+    cinema_www_mkindex_movie_card > "${cinemawwwdir}/moviecard.sgml"
+
+    env \
+	SP_CHARSET_FIXED=YES \
+	SP_ENCODING=utf-8 \
+	osgmlnorm -r -D "${cinemawwwdir}" movieindex.sgml \
+	> "${cinemawwwdir}/index-2.html"
+}
+
+cinema_www_mkindex_lang()
+{
+    cinema_awk -f `cinema_maketool cinema_www_mkindex_lang.awk` \
+	< "${cinemadbdir}/+DB-LANG"
+}
+
+cinema_www_mkindex_genre()
+{
+    cinema_awk -f `cinema_maketool cinema_www_mkindex_lang.awk` \
+	< "${cinemadbdir}/+IMDB-GENRE"
+}
+
+cinema_www_mkindex_stars()
+{
+    cinema_awk -f `cinema_maketool cinema_www_mkindex_stars.awk` \
+	< "${cinemadbdir}/+IMDB-STARS"
 }
 
 cinema_www_mkindex_movie_card()
 {
-    join -t'|' "${cinemadbdir}/+DB-INDEX" "${cinemadbdir}/+IMDB-STORYLINE" \
-	| cat
-#	| awk -f "${cinematooldir}/cinema_www_mkindex_movie_card.awk"
+    cinema_www_mkindex_lang > "${cinemawwwdir}/+LANG"
+    cinema_www_mkindex_genre > "${cinemawwwdir}/+GENRE"
+    cinema_www_mkindex_stars > "${cinemawwwdir}/+STARS"
+
+    join -t'|' "${cinemadbdir}/+DB-INDEX" "${cinemadbdir}/+IMDB-INDEX" \
+	| join -t'|' - "${cinemawwwdir}/+LANG" \
+	| join -t'|' - "${cinemawwwdir}/+STARS" \
+	| join -t'|' - "${cinemawwwdir}/+GENRE" \
+	| join -t'|' - "${cinemadbdir}/+IMDB-STORYLINE" \
+	| awk -f `cinema_maketool cinema_www_mkindex_movie_card.awk`
 }
 
 
@@ -453,9 +492,9 @@ cinema_db_import_all()
 
 #cinema_db_delete_all
 #cinema_db_import_all
-cinema_db_build_index
+#cinema_db_build_index
 #cinema_imdb_maybe_fetch_all
 #cinema_imdb_build_index
 #cinema_www_install_poster_all
-
-cinema_www_mkindex_movie_card
+#cinema_www_mkindex_movie_card
+cinema_www_mkindex

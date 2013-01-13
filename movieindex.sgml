@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" [
+<!ENTITY moviecard SYSTEM "moviecard.sgml">
+]>
+<html>
+<head>
+<title>Movie Index</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><link rel="stylesheet" title="Trendy"
+  type="text/css" href="style/trendy.css">
+</head>
+<body>
+<div class="main_vertical_list">
+&moviecard;
+</div>
+</body>
+</html>

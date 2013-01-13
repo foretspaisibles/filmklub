@@ -1,0 +1,39 @@
+div.main_vertical_list {
+    margin-left: auto;
+    margin-right: auto;
+    width: 65ex;
+    font-family: Helevetica Neue LTD, sans-serif;
+    font-size: 12pt;
+}
+div.movie_record p {
+    text-align: justify;
+}
+div.movie_title {
+    color: #006600;
+    font-size: 19pt;
+    font-weight: 600;
+    font-family: sans-serif;
+}
+div.movie_basics {
+    color: #0033CC;
+    font-size: 14pt;
+    font-style: italic;
+}
+div.movie_stars {
+    color: #663300;
+    text-align: right;
+}
+div.movie_extras {
+    color: #663300;
+    text-align: right;
+}
+img.movie_poster {
+    width: 4cm;
+    float: right;
+    margin-left: 2ex;
+    margin-bottom: 1ex;
+    right: 220pt;
+}
+div.movie_card {
+    margin-bottom: 3cm;
+}

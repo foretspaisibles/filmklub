@@ -27,16 +27,30 @@ Year: \1/
   s/ \| See full cast and crew//g
   s/ \|$//
 }
+#
+# Storyline
+#
 /^Storyline:/{
   s/ Written.*//
+  #
+  # Fix common wrong positions of whites
+  #
   s/' /'/g
+  s/ \([,.;:!?]\)/\1/g
+  #
+  # Enhance punctuations
+  #
+  # We add a space after the closing quotes. Note the clever use of
+  # the leading space to recognise opening quote!
   s/\.\.\./…/g
-  s/"\([^"]*\)"/“\1”/g
+  s/ "\([^"]*\)"/ “\1” /g
+  s/ '\([^']*\)'/ “\1” /g
   s/---/—/g
-  # Fix the use of single quotes as quotes
-  s/ '\([^']*\)'/ “\1”/g
   # Fix the position of punctuation
   s/”\([\.,]\)/\1”/g
+}
+/^Runtime:/{
+  s/ *min.*//g
 }
 /Add Full Plot/d
 /Add Synopsis/d
