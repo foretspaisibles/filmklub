@@ -66,8 +66,13 @@ function print_movie_card()
 {
     movie_card_id=movie_data["item"];
     gsub("_", "-", movie_card_id);
-    open_movie_divid("movie_card", movie_card_id);
+    open_movie_divid("movie_card_container", movie_card_id);
+
+    open_movie_div("movie_card_poster");
     print_movie_poster();
+    close_movie_div();
+
+    open_movie_div("movie_card");
     print_movie_div("movie_title", movie_data["title"]);
 
     open_movie_div("movie_basics");
@@ -88,6 +93,8 @@ function print_movie_card()
     close_movie_div();
 
     print_movie_div("movie_storyline", movie_data["storyline"]);
+    close_movie_div();
+
     close_movie_div();
 }
     
