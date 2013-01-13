@@ -410,12 +410,18 @@ cinema_www_mkindex()
     install -m 444 `cinema_maketool movieindex.sgml` "${cinemawwwdir}"
     install -m 444 `cinema_maketool trendy.css` "${cinemawwwdir}/style"
     cinema_www_mkindex_movie_card > "${cinemawwwdir}/moviecard.sgml"
+    cinema_www_mkindex_cross
 
     env \
 	SP_CHARSET_FIXED=YES \
 	SP_ENCODING=utf-8 \
 	osgmlnorm -r -D "${cinemawwwdir}" movieindex.sgml \
-	> "${cinemawwwdir}/index-2.html"
+	> "${cinemawwwdir}/index.html"
+
+    # && rm -f \
+    # 	"${cinemawwwdir}/+LANG" \
+    # 	"${cinemawwwdir}/+GENRE" \
+    # 	"${cinemawwwdir}/+STARS" \
 }
 
 cinema_www_mkindex_lang()
@@ -448,6 +454,12 @@ cinema_www_mkindex_movie_card()
 	| join -t'|' - "${cinemawwwdir}/+GENRE" \
 	| join -t'|' - "${cinemadbdir}/+IMDB-STORYLINE" \
 	| awk -f `cinema_maketool cinema_www_mkindex_movie_card.awk`
+}
+
+cinema_www_mkindex_cross()
+{
+    ocaml str.cma `cinema_maketool cinema_www_mkindex_cross.ml` \
+	"${cinemadbdir}" "${cinemawwwdir}"
 }
 
 

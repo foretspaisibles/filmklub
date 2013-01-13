@@ -19,8 +19,7 @@ div.movie_storyline {
 }
 div.movie_title {
     color: #006600;
-    font-size: 19pt;
-    font-weight: 900;
+    font-size: 24pt;
 }
 div.movie_basics {
     color: #0033CC;
@@ -60,4 +59,17 @@ a:visited {
 
 a:hover {
   color: #0033CC;
+}
+
+h1, h2 {
+    font-weight: normal;
+}
+
+h1 {
+    font-size: 36 pt;
+    text-align: center;
+}
+
+h2 {
+    dont-size: 24pt;
 }

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" [
 <!ENTITY moviecard SYSTEM "moviecard.sgml">
+<!ENTITY moviedirector SYSTEM "moviedirector.sgml">
+<!ENTITY movieyear SYSTEM "movieyear.sgml">
+<!ENTITY moviegenre SYSTEM "moviegenre.sgml">
+<!ENTITY moviestars SYSTEM "moviestars.sgml">
 ]>
 <html>
 <head>
@@ -9,8 +13,26 @@
   type="text/css" href="style/trendy.css">
 </head>
 <body>
+<div id="movienavigation">
+<ul>
+<li><a href="#MOVIEDIRECTORYTITLE">Title</a></li>
+<li><a href="#MOVIEDIRECTORYDIRECTOR">Director</a></li>
+<li><a href="#MOVIEDIRECTORYYEAR">Year</a></li>
+<li><a href="#MOVIEDIRECTORYGENRE">Genre</a></li>
+<li><a href="#MOVIEDIRECTORYSTARS">Stars</a></li>
+</ul>
+</div>
 <div class="main_vertical_list">
+<h1 id="moviedirectorytitle">Movie directory</h1>
 &moviecard;
+<h1 id="moviedirectorydirector">Movies listed by director</h1>
+&moviedirector;
+<h1 id="moviedirectoryyear">Movies listed by year</h1>
+&movieyear;
+<h1 id="moviedirectorygenre">Movies listed by genre</h1>
+&moviegenre;
+<h1 id="moviedirectorystars">Movies listed by stars</h1>
+&moviestars;
 </div>
 </body>
 </html>

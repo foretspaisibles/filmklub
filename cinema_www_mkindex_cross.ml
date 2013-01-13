@@ -11,8 +11,15 @@ struct
   let cinemadbdir =
     Sys.argv.(1)
 
+  let cinemawwwdir =
+    Sys.argv.(2)
+
   let cinemadb s =
     Filename.concat cinemadbdir s
+
+  let cinemawww s =
+    Filename.concat cinemawwwdir s
+
 end
 
 module Record =
@@ -56,13 +63,28 @@ struct
   let record_stream c =
     Stream.from (record_stream_f c)
 
+  let iter f c =
+    Stream.iter f (record_stream c)
+
+  let iterfile f filename =
+    let c = open_in filename in
+    begin
+      Stream.iter f (record_stream c);
+      close_in c;
+    end
+
+
   let read filename =
-    let s = record_stream (open_in filename) in
+    let c = open_in filename in
     let d = ref Dictionary.empty in
     let rec loop a r =
       a := Dictionary.add (R.key r) r !a
     in
-    Stream.iter (loop d) s; !d
+    begin
+      iter (loop d) c;
+      close_in c;
+      !d
+    end
 
   let slurp () =
     read R.filename
@@ -134,6 +156,52 @@ struct
 
 end
 
+
+module IMDBGenre =
+struct
+  let filename = 
+    Path.cinemadb "+IMDB-GENRE"
+
+  type t = {
+    item: string;
+    genre: string;
+  }
+
+  let split s =
+    let a = Record.split s in
+    {
+      item = a.(0);
+      genre = a.(1);
+    }
+
+  let key x =
+    x.item
+
+end
+
+module IMDBStars =
+struct
+  let filename = 
+    Path.cinemadb "+IMDB-STARS"
+
+  type t = {
+    item: string;
+    star: string;
+  }
+
+  let split s =
+    let a = Record.split s in
+    {
+      item = a.(0);
+      star = a.(1);
+    }
+
+  let key x =
+    x.item
+
+end
+
+
 module Movie =
 struct
 
@@ -142,6 +210,20 @@ struct
     title: string;
   }
 
+  let canonise_title x =
+    if x.title = "" then
+      sprintf "%s (title not defined)" x.id
+    else
+      x.title
+
+  let canonise_id_replace =
+    let re = Str.regexp "_" in
+    function s -> Str.global_replace re "-" s
+
+  let canonise_id x =
+    canonise_id_replace (String.uppercase x.id)
+    
+
   let compare x y =
     String.compare x.title y.title
 
@@ -149,7 +231,7 @@ struct
     printf "{ id = %S; title = %S; }\n%!" x.id x.title
 
   let output_anchor c x =
-    fprintf c "<a href=\"#%s\">%s</a>\n" x.id x.title
+    fprintf c "<a href=\"#%s\">%s</a>\n" (canonise_id x) (canonise_title x)
 
   let print_anchor x =
     output_anchor stdout x
@@ -185,6 +267,9 @@ struct
     let index_sz = 64 in
     let module DatabaseDBIndex = Database(DBIndex) in
     let module DatabaseIMDBIndex = Database(IMDBIndex) in
+    let module DatabaseIMDBGenre = Database(IMDBGenre) in
+    let module DatabaseIMDBStars = Database(IMDBStars) in
+
     {
       db_index = DatabaseDBIndex.slurp();
       imdb_index = DatabaseIMDBIndex.slurp();
@@ -220,10 +305,39 @@ struct
     in
     populate_table get_year x x.imdb_index x.year
 
+  let populate_attribute iterfile file key attribute x index =
+    let loop r =
+      Index.add index (attribute r) (movie x (key r))
+    in
+    iterfile loop file
+
+  let populate_genre x =
+    let module DatabaseIMDBGenre = Database(IMDBGenre) in
+    let key r =
+      r.IMDBGenre.item
+    in
+    let attribute r =
+      r.IMDBGenre.genre
+    in
+    populate_attribute DatabaseIMDBGenre.iterfile (Path.cinemadb "+IMDB-GENRE") key attribute x x.genre
+
+  let populate_stars x =
+    let module DatabaseIMDBStars = Database(IMDBStars) in
+    let key r =
+      r.IMDBStars.item
+    in
+    let attribute r =
+      r.IMDBStars.star
+    in
+    populate_attribute DatabaseIMDBStars.iterfile (Path.cinemadb "+IMDB-STARS") key attribute x x.stars
+
+
   let populate_all x =
     begin
       populate_director x;
       populate_year x;
+      populate_genre x;
+      populate_stars x;
     end
 
   let keys table =
@@ -238,23 +352,43 @@ struct
   let output_table c cls table =
     let loop k =
       let a = List.sort Movie.compare (Index.find_all table k) in
+      let b = ref false in
+      let output_anchor c m =
+	begin
+	  if !b then output_string c " ❖ ";
+	  b := true;
+	  Movie.output_anchor c m;
+	end
+      in
       begin
 	fprintf c "<h2 class=\"%s\">%s</h2>\n" cls k;
-	List.iter (Movie.output_anchor c) a;
+	List.iter (output_anchor c) a;
       end
     in List.iter loop (keys table)
 
-  let output_all c x =
+  let write_table file cls table =
+    let c = open_out (Path.cinemawww file) in
     begin
-      output_table c "movie_index_director" x.director;
-      output_table c "movie_index_year" x.year;
+      output_table c cls table;
+      close_out c;
     end
 
-  let print_all x =
-    output_all stdout x
+  let write_all x =
+    begin
+      write_table "moviedirector.sgml" "movie_index_director" x.director;
+      write_table "movieyear.sgml" "movie_index_year" x.year;
+      write_table "moviegenre.sgml" "movie_index_genre" x.genre;
+      write_table "moviestars.sgml" "movie_index_stars" x.stars;
+    end
 
 end
 
+let main () =
+  let c = Cross.make() in
+  begin
+    Cross.populate_all c;
+    Cross.write_all c;
+  end
 
-let c = Cross.make()
-let _ = Cross.populate_all c; Cross.print_all c
+let _ =
+  main ()
