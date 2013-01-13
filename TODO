@@ -1,0 +1,7 @@
+* Tool to easily pack and repack Matroska files, so that fixing
+  metadata becomes something easy.
+* Move the IMDB Key to the official one (Title - Date)
+* Work on offline DB instead of unreliably extracting data of the WWW
+* Write the whole thing in OCaml
+* Mind about extending the DB to other medias, like AUDIO or DIGITIZED
+  PAPER, or PICTURES.
